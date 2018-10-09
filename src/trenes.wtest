@@ -1,32 +1,38 @@
 import trenes.*
 import locomotoras.*
 import vagones.*
+import ciudades.*
 import depositos.*
 
 describe "Trenes" {
+  const vagonCarga = new VagonCarga()
+  
+  var vagones = [
+    new VagonPasajeros(10, 2),
+    new VagonPasajeros(10, 3)
+  ]
+  
+  var locomotoras = [
+    new Locomotora(1000, 12000, 80),
+    new Locomotora(2000, 11000, 40)
+  ]
+  
   method crearTren() {
-    var vagones = []
-    var locomotoras = []
-    const vagonCarga = new VagonCarga()
     vagonCarga.cargaMaxima(100)
     vagones.add(vagonCarga)
-    vagones.add(new VagonPasajeros(10, 2))
-    vagones.add(new VagonPasajeros(10, 3))    
-    locomotoras.add(new Locomotora(1000, 12000, 80))
-    locomotoras.add(new Locomotora(2000, 11000, 40))
     return new Tren(locomotoras, vagones)
   }
   
   method crearTrenSinEmpuje() {
-    var vagones = []
-    var locomotoras = []
-    const vagonCarga = new VagonCarga()
-    vagonCarga.cargaMaxima(100)
-    vagones.add(vagonCarga)
-    vagones.add(new VagonPasajeros(10, 2))
-    vagones.add(new VagonPasajeros(10, 3)) 
-    locomotoras.add(new Locomotora(2000, 11000, 40))
-    return new Tren(locomotoras, vagones)
+    return new Tren(new Locomotora(2000, 11000, 40), vagones)
+  }
+  
+  method crearTrenCortaDistancia() {
+    return new TrenCortaDistancia(locomotoras, vagones)
+  }
+  
+  method crearTrenLargaDistancia() {
+    return new TrenLargaDistancia(locomotoras, vagones)
   }
   
   test "VagonPasajeros: Si ancho es 2m y largo 10m, cantidad de pasajeros es 80" {
@@ -68,7 +74,7 @@ describe "Trenes" {
   
   test "Tren: cantidad de vagones livianos correctamente devuelta" {
     var tren = self.crearTren()
-    assert.equals(1, tren.cantidadDeVagonesLivianos())
+    assert.equals(2, tren.cantidadDeVagonesLivianos())
   }
   
   test "Tren: velocidad maxima correctamente devuelta" {
@@ -84,6 +90,28 @@ describe "Trenes" {
   test "Tren: cuantoEmpujeFalta correctamente devuelto" {
     var tren = self.crearTren()
     assert.equals(0, tren.cuantoEmpujeFalta())
+  }
+  
+  test "TrenCortaDistancia: no esta correctamente armada" {
+    var tren = self.crearTrenCortaDistancia()
+    assert.that(!tren.estaBienArmada())
+  }
+  
+  test "TrenLargaDistancia: no esta correctamente armada" {
+    var tren = self.crearTrenLargaDistancia()
+    assert.that(!tren.estaBienArmada())
+  }
+  
+  test "TrenCortaDistancia: su velocidad maxima no puede ser mayor a 60" {
+    var tren = self.crearTrenCortaDistancia()
+    assert.equals(40, tren.velocidadMaxima())
+  }
+  
+  test "TrenLargaDistancia: su velocidad maxima no puede ser mas de 200 si son dos ciudades grandes" {
+    var tren = self.crearTrenLargaDistancia()
+    tren.origen(new Ciudad(true))
+    tren.destino(new Ciudad(true))
+    assert.equals(40, tren.velocidadMaxima())
   }
   
   test "Deposito: vagonesMasPesados correctamente devuelto" {
