@@ -12,9 +12,18 @@ describe "Trenes" {
     new VagonPasajeros(10, 3)
   ]
   
+  var vagonesLivianos = [
+    new VagonPasajeros(2, 2),
+    new VagonPasajeros(1, 2)
+  ]
+  
   var locomotoras = [
     new Locomotora(1000, 12000, 80),
     new Locomotora(2000, 11000, 40)
+  ]
+  
+  var locomotorasRapidas = [
+    new Locomotora(1000, 12000, 350)
   ]
   
   method crearTren() {
@@ -33,6 +42,10 @@ describe "Trenes" {
   
   method crearTrenLargaDistancia() {
     return new TrenLargaDistancia(locomotoras, vagones)
+  }
+  
+  method crearTrenAltaVelocidadBienArmado() {
+    return new TrenAltaVelocidad(locomotorasRapidas, vagonesLivianos)
   }
   
   test "VagonPasajeros: Si ancho es 2m y largo 10m, cantidad de pasajeros es 80" {
@@ -114,11 +127,18 @@ describe "Trenes" {
     assert.equals(40, tren.velocidadMaxima())
   }
   
+  test "TrenAltaVelocidad: esta correctamente armado" {
+    var tren = self.crearTrenAltaVelocidadBienArmado()
+    tren.origen(new Ciudad(true))
+    tren.destino(new Ciudad(true))
+    assert.that(tren.estaBienArmada())
+  }
+  
   test "Deposito: vagonesMasPesados correctamente devuelto" {
     var deposito = new Deposito()
-    var vagon = new VagonPasajeros(10, 3)
+    var vagon = [new VagonPasajeros(10, 3)]
     deposito.agregarFormacion(self.crearTren())
-    assert.equals([vagon], deposito.vagonesMasPesados())
+    assert.equals(vagon, deposito.vagonesMasPesados())
   }
   
   test "Deposito: necesitaConductorExperimentado correctamente devuelto" {
@@ -140,7 +160,7 @@ describe "Trenes" {
     deposito.agregarFormacion(self.crearTrenSinEmpuje())
     deposito.agregarLocomotora(new Locomotora(1500, 20000, 85))
     deposito.agregarLocomotoraATren()
-    assert.equals(0, deposito.locomotoras().size())
+    assert.equals(1, deposito.locomotoras().size())
   }
   
 }

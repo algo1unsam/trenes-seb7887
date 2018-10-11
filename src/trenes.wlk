@@ -18,6 +18,8 @@ class Tren {
   method cantidadDeVagonesLivianos() {
     return vagones.filter({ vagon => vagon.pesoMaximo() < 2500 }).size()
   }
+  
+  method todosLivianos() = self.cantidadDeVagonesLivianos() === vagones.size()
 
   method velocidadMaximaLocomotoras() {
     return locomotoras.min({ locomotora => locomotora.velocidadMaxima() }).velocidadMaxima()
@@ -97,8 +99,8 @@ class TrenLargaDistancia inherits Tren {
  */
 class TrenAltaVelocidad inherits TrenLargaDistancia {
 
-  override method velocidadMaxima() = self.velocidadMaximaLocomotoras().min(400)
+  override method velocidadMaximaLegal() = 400
 
-  override method estaBienArmada() = self.velocidadMaxima() >= 250 and self.cantidadDeVagonesLivianos() === vagones.size()
+  override method estaBienArmada() = super() and (self.velocidadMaxima() >= 250) and self.todosLivianos()
 
 }
